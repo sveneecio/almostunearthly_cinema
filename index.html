@@ -77,6 +77,24 @@
         .barcode-label { letter-spacing: 2px; font-size: 0.8rem; margin-top: 15px; }
         .barcode { font-family: 'Libre Barcode 39 Text', cursive; font-size: 3.5rem; line-height: 1; margin-top: 5px; }
 
+        #reviewText {
+            overflow-wrap: break-word;
+        }
+        
+        /* Gaya untuk div review sementara saat di-screenshot */
+        .review-display-for-canvas {
+            font-size: 1rem;
+            font-family: inherit;
+            color: #212529;
+            padding: 0.375rem 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: 0.375rem;
+            min-height: 62px; /* Setara dengan rows=3 agar layout tidak bergeser */
+            white-space: pre-wrap; /* Penting untuk menjaga baris baru */
+            word-break: break-word; /* Penting untuk memecah kata panjang */
+            background-color: #fff;
+        }
+
         @media (max-width: 992px) {
             body { background-image: none; }
         }
@@ -255,30 +273,50 @@
             const downloadButton = document.getElementById('submitAndDownloadBtn');
             const ticketElement = document.getElementById('ticket');
             const cashierInput = document.getElementById('cashier-input');
+            const reviewTextarea = document.getElementById('reviewText');
 
             downloadButton.addEventListener('click', function() {
+                // --- PERSIAPAN SEBELUM SCREENSHOT ---
+                
+                // 1. Sembunyikan tombol download
                 downloadButton.style.display = 'none';
                 
+                // 2. Ubah input kasir menjadi teks statis
                 const cashierName = cashierInput.value.trim() || 'N/A';
                 const cashierSpan = document.createElement('span');
                 cashierSpan.textContent = cashierName;
                 cashierInput.style.display = 'none';
                 cashierInput.parentNode.appendChild(cashierSpan);
 
+                // 3. (BARU) Ubah textarea review menjadi div agar semua teks terlihat
+                const reviewDisplay = document.createElement('div');
+                reviewDisplay.textContent = reviewTextarea.value;
+                reviewDisplay.className = 'review-display-for-canvas'; // Gunakan class CSS untuk styling
+                reviewTextarea.style.display = 'none';
+                reviewTextarea.parentNode.appendChild(reviewDisplay);
+
+
+                // --- AMBIL SCREENSHOT ---
                 html2canvas(ticketElement, { scale: 2, useCORS: true }).then(canvas => {
                     const link = document.createElement('a');
                     link.download = 'tiket-unearthly-cinema.jpg';
                     link.href = canvas.toDataURL('image/jpeg', 0.9);
                     link.click();
-
-                    downloadButton.style.display = 'block';
-                    cashierInput.style.display = 'block';
-                    cashierInput.parentNode.removeChild(cashierSpan);
                 }).catch(err => {
                     console.error("Oops, something went wrong!", err);
+                }).finally(() => {
+                    // --- KEMBALIKAN TAMPILAN SEPERTI SEMULA SETELAH SELESAI ---
+                    
+                    // 1. Tampilkan kembali tombol download
                     downloadButton.style.display = 'block';
+
+                    // 2. Kembalikan input kasir
                     cashierInput.style.display = 'block';
                     cashierInput.parentNode.removeChild(cashierSpan);
+
+                    // 3. (BARU) Kembalikan textarea review
+                    reviewTextarea.style.display = 'block';
+                    reviewTextarea.parentNode.removeChild(reviewDisplay);
                 });
             });
 

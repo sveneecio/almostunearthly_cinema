@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unearthly Almost Cinema - Tiket Dinamis V2</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Pacifico&family=Libre+Barcode+39+Text&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome (for star icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        body {
+            background-color: #f0f2f5;
+            font-family: 'Lato', sans-serif;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 40px 0;
+            background-image: 
+                url('https://i.imgur.com/39wFqN2.png'),
+                url('https://i.imgur.com/kS5x87J.png');
+            background-repeat: no-repeat;
+            background-position: 
+                right 5vw top 25vh, 
+                left 5vw bottom 0;
+            background-size: 200px, 300px;
+        }
+
+        .ticket-container {
+            background-color: #ffffff;
+            max-width: 450px;
+            width: 100%;
+            padding: 40px 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 10;
+        }
+        
+        .ticket-header { text-align: center; margin-bottom: 30px; }
+        .logo { font-size: 2.8rem; font-weight: 700; color: #333; margin-bottom: 0; }
+        .logo .script { font-family: 'Pacifico', cursive; color: #d92323; font-weight: 400; }
+        .cinema-info { color: #555; margin-top: 5px; }
+        
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px dashed #ccc;
+            color: #444;
+        }
+        .detail-item span:last-child, .detail-item input { font-weight: 700; text-align: right; }
+        .detail-item input.form-control {
+            border: none;
+            padding: 0;
+            height: auto;
+            box-shadow: none;
+            background-color: transparent;
+        }
+
+        .section-title { text-align: center; font-weight: 700; color: #555; letter-spacing: 1px; margin: 30px 0 20px 0; }
+        
+        .star-rating .fa-star { font-size: 1.8rem; color: #ccc; cursor: pointer; transition: color 0.2s; }
+        .star-rating .fa-star.filled { color: #000000; }
+        
+        .total-line { border-top: 2px solid #333; margin-top: 10px; padding-top: 10px; font-size: 1.2rem; font-weight: bold; }
+
+        .ticket-footer { text-align: center; margin-top: 20px; color: #666; font-size: 0.9rem; }
+        .barcode-label { letter-spacing: 2px; font-size: 0.8rem; margin-top: 15px; }
+        .barcode { font-family: 'Libre Barcode 39 Text', cursive; font-size: 3.5rem; line-height: 1; margin-top: 5px; }
+
+        @media (max-width: 992px) {
+            body { background-image: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ticket-container" id="ticket">
+        <div class="ticket-header">
+            <h1 class="logo">  <span class="script">Almost</span> Unearthly</h1>
+            <p class="cinema-info">
+                Unearthly Cinema<br>
+                1234 Movie Blvd, Hollywood, CA 90210<br>
+                (555) 123-FILM
+            </p>
+        </div>
+
+        <div class="transaction-details">
+            <div class="detail-item"><span>Date:</span><span id="date-val">2025-06-26</span></div>
+            <div class="detail-item"><span>Time:</span><span id="time-val">21:33:47</span></div>
+            <div class="detail-item"><span>Cashier:</span><input type="text" id="cashier-input" class="form-control" placeholder="Your Name"></div>
+            <div class="detail-item"><span>Theater:</span><span>Screen 7</span></div>
+            <div class="detail-item"><span>Transaction:</span><span>TXN-L9YL170L8</span></div>
+        </div>
+
+        <div class="movie-review-form">
+            <h2 class="section-title">MOVIE SELECTION & REVIEW</h2>
+            <form id="reviewForm">
+                <div class="mb-3">
+                    <label for="movieSelect" class="form-label">Choose Movie:</label>
+                    <select class="form-select" id="movieSelect"></select>
+                </div>
+                
+                <div id="otherMovieContainer" style="display: none;">
+                    <div class="mb-3">
+                        <label for="otherMovieInput" class="form-label">Nama Film Lainnya:</label>
+                        <input type="text" class="form-control" id="otherMovieInput" placeholder="Ketik judul film di sini">
+                    </div>
+                     <div class="mb-3">
+                        <label for="otherGenreSelect" class="form-label">Pilih Genre:</label>
+                        <select class="form-select" id="otherGenreSelect"></select>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Rate this Movie:</label>
+                    <div class="star-rating">
+                        <i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="reviewText" class="form-label">Write Review:</label>
+                    <textarea class="form-control" id="reviewText" rows="3" placeholder="Please write here"></textarea>
+                </div>
+            </form>
+        </div>
+
+        <div class="pricing-details mt-4">
+            <div class="detail-item"><span>Ticket Price:</span><span id="ticket-price">$0.00</span></div>
+            <div class="detail-item"><span>Service Fee:</span><span id="service-fee">$0.00</span></div>
+            <div class="detail-item"><span>Tax:</span><span id="tax">$0.00</span></div>
+            <div class="detail-item total-line"><span>TOTAL:</span><span id="total-price">$0.00</span></div>
+        </div>
+
+        <div class="payment-details mt-2">
+            <div class="detail-item"><span>Payment Method:</span><span>VISA ****1234</span></div>
+            <div class="detail-item" style="border-bottom: none;"><span>Change:</span><span>$0.00</span></div>
+        </div>
+
+        <div class="ticket-footer">
+            <p class="mb-1">Thank you for choosing Cinema Palace!</p>
+            <p class="mb-2">Enjoy your movie experience.</p>
+            <p class="barcode-label">BARCODE</p>
+            <div class="barcode">*TXNL9YL170L8*</div>
+            <button type="button" id="submitAndDownloadBtn" class="btn btn-dark w-100 mt-3">Download Ticket as JPG</button>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- DATA FILM DAN HARGA BERDASARKAN GENRE ---
+            const movies = [
+                { title: "The Notebook", genre: "Romance", price: 10.00 },
+                { title: "John Wick: Chapter 4", genre: "Action", price: 12.00 },
+                { title: "Dune: Part Two", genre: "Sci-Fi", price: 12.00 },
+            ];
+
+            const genrePrices = {
+                "Romance": 10.00,
+                "Action": 12.00,
+                "Horror": 10.00,
+                "Thriller": 10.50,
+                "Fantasy": 11.00,
+                "Comedy": 13.00,
+                "Sci-Fi": 12.00,
+                "Drama": 9.50,
+                "Animation": 11.50
+            };
+
+            // --- VARIABEL DOM ---
+            const movieSelect = document.getElementById('movieSelect');
+            const otherMovieContainer = document.getElementById('otherMovieContainer');
+            const otherGenreSelect = document.getElementById('otherGenreSelect');
+            const ticketPriceEl = document.getElementById('ticket-price');
+            const serviceFeeEl = document.getElementById('service-fee');
+            const taxEl = document.getElementById('tax');
+            const totalPriceEl = document.getElementById('total-price');
+            
+            // --- FUNGSI UNTUK MENGISI DROPDOWN ---
+            function populateMovies() {
+                let optionsHTML = '<option selected value="">-- Pilih Film --</option>';
+                movies.forEach((movie, index) => {
+                    optionsHTML += `<option value="${index}">${movie.title} (${movie.genre})</option>`;
+                });
+                optionsHTML += '<option value="another">Lainnya (Tulis Sendiri)...</option>';
+                movieSelect.innerHTML = optionsHTML;
+            }
+
+            function populateGenres() {
+                let optionsHTML = '<option selected value="">-- Pilih Genre --</option>';
+                for (const genre in genrePrices) {
+                    optionsHTML += `<option value="${genre}">${genre}</option>`;
+                }
+                otherGenreSelect.innerHTML = optionsHTML;
+            }
+
+            // --- FUNGSI UNTUK MEMPERBARUI HARGA ---
+            function updatePricing(basePrice = 0) {
+                const price = Number(basePrice);
+                const serviceFee = price > 0 ? 1.50 : 0;
+                const tax = (price + serviceFee) * 0.08; // Pajak 8%
+                const total = price + serviceFee + tax;
+
+                ticketPriceEl.textContent = `$${price.toFixed(2)}`;
+                serviceFeeEl.textContent = `$${serviceFee.toFixed(2)}`;
+                taxEl.textContent = `$${tax.toFixed(2)}`;
+                totalPriceEl.textContent = `$${total.toFixed(2)}`;
+            }
+
+            // --- EVENT LISTENERS ---
+            movieSelect.addEventListener('change', function() {
+                const selectedValue = this.value;
+                if (selectedValue === 'another') {
+                    otherMovieContainer.style.display = 'block';
+                    otherGenreSelect.value = ''; // Reset pilihan genre
+                    updatePricing(0);
+                } else if (selectedValue === '') {
+                    otherMovieContainer.style.display = 'none';
+                    updatePricing(0);
+                } else {
+                    otherMovieContainer.style.display = 'none';
+                    const selectedMovie = movies[selectedValue];
+                    updatePricing(selectedMovie.price);
+                }
+            });
+
+            otherGenreSelect.addEventListener('change', function() {
+                const selectedGenre = this.value;
+                const price = genrePrices[selectedGenre] || 0;
+                updatePricing(price);
+            });
+
+            // --- Logika Rating Bintang ---
+            const stars = document.querySelectorAll('.star-rating .fa-star');
+            stars.forEach(star => {
+                star.addEventListener('click', function () {
+                    const ratingValue = this.getAttribute('data-value');
+                    stars.forEach(s => s.classList.toggle('filled', s.getAttribute('data-value') <= ratingValue));
+                });
+            });
+
+            // --- Logika untuk Tombol Download JPG ---
+            const downloadButton = document.getElementById('submitAndDownloadBtn');
+            const ticketElement = document.getElementById('ticket');
+            const cashierInput = document.getElementById('cashier-input');
+
+            downloadButton.addEventListener('click', function() {
+                downloadButton.style.display = 'none';
+                
+                const cashierName = cashierInput.value.trim() || 'N/A';
+                const cashierSpan = document.createElement('span');
+                cashierSpan.textContent = cashierName;
+                cashierInput.style.display = 'none';
+                cashierInput.parentNode.appendChild(cashierSpan);
+
+                html2canvas(ticketElement, { scale: 2, useCORS: true }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = 'tiket-unearthly-cinema.jpg';
+                    link.href = canvas.toDataURL('image/jpeg', 0.9);
+                    link.click();
+
+                    downloadButton.style.display = 'block';
+                    cashierInput.style.display = 'block';
+                    cashierInput.parentNode.removeChild(cashierSpan);
+                }).catch(err => {
+                    console.error("Oops, something went wrong!", err);
+                    downloadButton.style.display = 'block';
+                    cashierInput.style.display = 'block';
+                    cashierInput.parentNode.removeChild(cashierSpan);
+                });
+            });
+
+            // --- INISIALISASI HALAMAN ---
+            populateMovies();
+            populateGenres();
+            updatePricing(0);
+        });
+    </script>
+</body>
+</html>
